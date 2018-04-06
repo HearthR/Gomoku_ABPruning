@@ -11,7 +11,7 @@ int main()
 {
 	Board board_init;
 	BoardEval evaluator;
-
+	
 	board_init.game_board[10][10] = -1;
 	board_init.game_board[10][11] = 1;
 	board_init.game_board[9][10] = -1;

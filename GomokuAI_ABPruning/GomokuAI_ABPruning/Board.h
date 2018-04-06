@@ -3,8 +3,11 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#define BOARD_ROW 15
-#define BOARD_COLUMN 15
+#define BOARD_ROW 19
+#define BOARD_COLUMN 19
+
+#include <iostream>
+#include <iomanip>
 
 class Board
 {

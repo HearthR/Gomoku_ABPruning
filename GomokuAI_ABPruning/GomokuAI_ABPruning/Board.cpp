@@ -1,9 +1,6 @@
 #include "Board.h"
 #include "BoardEval.h"
-#include <iostream>
-#include <array>
-#include <vector>
-#include <iomanip>
+
 
 using namespace std;
 
@@ -57,9 +54,13 @@ void Board::moveStone()
 	cin >> row >> col;
 	row = posTranslate(row);
 
-	if (row != -1 && col >= 0 && col <= 14)
+	if (row != -1 && col >= 0 && col < BOARD_COLUMN)
 	{
 		game_board[row][col] = -1;
+	}
+	else
+	{
+		return;
 	}
 
 	displayBoard();
@@ -87,13 +88,13 @@ void Board::moveStone()
 int Board::posTranslate(char row)
 {
 	int translated_row = 0;
-	if (row >= 'A' && row <= 'O')
+	if ((int)row >= (int)('A') && (int)row < (int)('A' + BOARD_ROW))
 	{
-		translated_row = row - 65;
+		translated_row = (int)(row - 65);
 	}
-	else if (row >= 'a' && row <= 'o')
+	else if ((int)row >= (int)('a') && (int)row < (int)('a' + BOARD_ROW))
 	{
-		translated_row = row - 97;
+		translated_row = (int)(row - 97);
 	}
 	else
 	{
@@ -116,7 +117,7 @@ int *Board::getLatestPos()
 
 void Board::displayBoard()
 {
-	for (int i = 0; i <= 15; i++)
+	for (int i = 0; i <= BOARD_COLUMN; i++)
 	{
 		if (i == 0)
 		{

@@ -1,5 +1,4 @@
 #include "BoardEval.h"
-#include <iostream>
 
 
 BoardEval::BoardEval()
@@ -34,9 +33,7 @@ bool BoardEval::checkWin(Board *gboard)
 				c = checkDiagonalA(gboard, cur_player, i, j);
 				d = checkDiagonalB(gboard, cur_player, i, j);
 
-//				std::cout << "Current: " << cur_player << " coor: " << i << j << " " << a << " " << b << " " << c << " " << d << std::endl;
-
-				if (a == 4 || b == 4 || c == 4 || d == 4)
+				if (a == 5 || b == 5 || c == 5 || d == 5)
 				{
 					return true;
 				}
@@ -57,44 +54,21 @@ int BoardEval::checkHorizontal(Board *gboard, int cur_player, int row, int col)
 		return stone_count;
 	}
 	
-	if (cur_player == gboard->getBoardValue(row, col + 1))
+	for (int i = 0; i < 5; i++)
 	{
-		if (cur_player == gboard->getBoardValue(row, col + 2))
+		if (gboard->getBoardValue(row, col - 2 + i) == -cur_player)
 		{
-			stone_count += 2;
+			return 0;
+		}
+		else if(gboard->getBoardValue(row, col - 2 + i) == cur_player)
+		{
+			stone_count++;
 		}
 		else
 		{
-			stone_count += 1;
+			continue;
 		}
 	}
-	else
-	{
-		if (gboard->getBoardValue(row, col + 1) == 0 && cur_player == gboard->getBoardValue(row, col + 2))
-		{
-			stone_count += 1;
-		}
-	}
-
-	if (cur_player == gboard->getBoardValue(row, col - 1))
-	{
-		if (cur_player == gboard->getBoardValue(row, col - 2))
-		{
-			stone_count += 2;
-		}
-		else
-		{
-			stone_count += 1;
-		}
-	}
-	else
-	{
-		if (gboard->getBoardValue(row, col - 1) == 0 && cur_player == gboard->getBoardValue(row, col - 2))
-		{
-			stone_count += 1;
-		}
-	}
-
 
 	return stone_count;
 }
@@ -109,41 +83,19 @@ int BoardEval::checkVertical(Board *gboard, int cur_player, int row, int col)
 		return stone_count;
 	}
 
-	if (cur_player == gboard->getBoardValue(row + 1, col))
+	for (int i = 0; i < 5; i++)
 	{
-		if (cur_player == gboard->getBoardValue(row + 2, col))
+		if (gboard->getBoardValue(row - 2 + i, col) == -cur_player)
 		{
-			stone_count += 2;
+			return 0;
+		}
+		else if (gboard->getBoardValue(row - 2 + i, col) == cur_player)
+		{
+			stone_count++;
 		}
 		else
 		{
-			stone_count += 1;
-		}
-	}
-	else
-	{
-		if (gboard->getBoardValue(row + 1, col) == 0 && cur_player == gboard->getBoardValue(row + 2, col))
-		{
-			stone_count += 1;
-		}
-	}
-
-	if (cur_player == gboard->getBoardValue(row - 1, col))
-	{
-		if (cur_player == gboard->getBoardValue(row - 2, col))
-		{
-			stone_count += 2;
-		}
-		else
-		{
-			stone_count += 1;
-		}
-	}
-	else
-	{
-		if (gboard->getBoardValue(row - 1, col) == 0 && cur_player == gboard->getBoardValue(row - 2, col))
-		{
-			stone_count += 1;
+			continue;
 		}
 	}
 
@@ -160,41 +112,19 @@ int BoardEval::checkDiagonalA(Board *gboard, int cur_player, int row, int col)
 		return stone_count;
 	}
 
-	if (cur_player == gboard->getBoardValue(row + 1, col + 1))
+	for (int i = 0; i < 5; i++)
 	{
-		if (cur_player == gboard->getBoardValue(row + 2, col + 2))
+		if (gboard->getBoardValue(row - 2 + i, col - 2 + i) == -cur_player)
 		{
-			stone_count += 2;
+			return 0;
+		}
+		else if (gboard->getBoardValue(row - 2 + i, col - 2 + i) == cur_player)
+		{
+			stone_count++;
 		}
 		else
 		{
-			stone_count += 1;
-		}
-	}
-	else
-	{
-		if (gboard->getBoardValue(row + 1, col + 1) == 0 && cur_player == gboard->getBoardValue(row + 2, col + 2))
-		{
-			stone_count += 1;
-		}
-	}
-
-	if (cur_player == gboard->getBoardValue(row - 1, col - 1))
-	{
-		if (cur_player == gboard->getBoardValue(row - 2, col - 2))
-		{
-			stone_count += 2;
-		}
-		else
-		{
-			stone_count += 1;
-		}
-	}
-	else
-	{
-		if (gboard->getBoardValue(row - 1, col - 1) == 0 && cur_player == gboard->getBoardValue(row - 2, col - 2))
-		{
-			stone_count += 1;
+			continue;
 		}
 	}
 
@@ -211,41 +141,19 @@ int BoardEval::checkDiagonalB(Board *gboard, int cur_player, int row, int col)
 		return stone_count;
 	}
 
-	if (cur_player == gboard->getBoardValue(row + 1, col - 1))
+	for (int i = 0; i < 5; i++)
 	{
-		if (cur_player == gboard->getBoardValue(row + 2, col - 2))
+		if (gboard->getBoardValue(row - 2 + i, col + 2 - i) == -cur_player)
 		{
-			stone_count += 2;
+			return 0;
+		}
+		else if (gboard->getBoardValue(row - 2 + i, col + 2 - i) == cur_player)
+		{
+			stone_count++;
 		}
 		else
 		{
-			stone_count += 1;
-		}
-	}
-	else
-	{
-		if (gboard->getBoardValue(row + 1, col - 1) == 0 && cur_player == gboard->getBoardValue(row + 2, col - 2))
-		{
-			stone_count += 1;
-		}
-	}
-
-	if (cur_player == gboard->getBoardValue(row - 1, col + 1))
-	{
-		if (cur_player == gboard->getBoardValue(row - 2, col + 2))
-		{
-			stone_count += 2;
-		}
-		else
-		{
-			stone_count += 1;
-		}
-	}
-	else
-	{
-		if (gboard->getBoardValue(row - 1, col + 1) == 0 && cur_player == gboard->getBoardValue(row - 2, col + 2))
-		{
-			stone_count += 1;
+			continue;
 		}
 	}
 
@@ -255,22 +163,36 @@ int BoardEval::checkDiagonalB(Board *gboard, int cur_player, int row, int col)
 void BoardEval::abPruning(Board *gboard)
 {
 	Board tboard(gboard);
+	int cur_depth_eval;
+	int max_eval = INT_MIN;
+	int max_eval_coor[2] = { 0, 0 };
+	clock_t start_time = clock();
 
-	for (int depth = 0; depth < 2; depth++)	// 최선의 선택을 어떻게 저장(반환)할 것인지 다시 생각해보기
+	for (int depth = 0;; depth++)	// 최선의 선택을 어떻게 저장(반환)할 것인지 다시 생각해보기
 	{										// pruning이 제대로 되는지 확인해보기(시간), evaluation function 다시 확인, check함수들 다시 확인
 		std::cout << depth << std::endl;
-		max_Value(&tboard, INT_MIN, INT_MAX, depth);
-	}
+		cur_depth_eval = max_Value(&tboard, INT_MIN, INT_MAX, depth, start_time);
+		std::cout << "cur_depth_eval: " << cur_depth_eval << " max_eval: " << max_eval <<  std::endl;
+		if (cur_depth_eval > max_eval)
+		{
+			max_eval_coor[0] = tboard.status[0];
+			max_eval_coor[1] = tboard.status[1];
+			max_eval = cur_depth_eval;
+		}
 
+		if ((clock() - start_time) / CLOCKS_PER_SEC >= TIME_LIMIT)
+		{
+			break;
+		}
+	}
+	std::cout << "final max_eval: " << max_eval << std::endl;
 	gboard->game_board[tboard.status[0]][tboard.status[1]] = 1;
 }
 
-int BoardEval::max_Value(Board *gboard, int a, int b, int depth)
+int BoardEval::max_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 {
-	if (depth == 0 || checkWin(gboard))
+	if (checkWin(gboard) || depth == 0 || (clock() - s_time) / CLOCKS_PER_SEC >= TIME_LIMIT)
 	{
-//		gboard->displayBoard();
-//		std::cout << evalFunc(gboard) << std::endl;
 		return evalFunc(gboard);
 	}
 
@@ -282,8 +204,6 @@ int BoardEval::max_Value(Board *gboard, int a, int b, int depth)
 		{
 			if (gboard->game_board[i][j] == 0)
 			{
-//				gboard->status[0] = i;
-//				gboard->status[1] = j;
 				gboard->game_board[i][j] = 1;
 			}
 			else
@@ -291,7 +211,7 @@ int BoardEval::max_Value(Board *gboard, int a, int b, int depth)
 				continue;
 			}
 
-			min_player_value = min_Value(gboard, a, b, depth - 1);
+			min_player_value = min_Value(gboard, a, b, depth - 1, s_time);
 
 			// max(alpha, min_val)
 			if (min_player_value > a)
@@ -313,13 +233,13 @@ int BoardEval::max_Value(Board *gboard, int a, int b, int depth)
 	return a;
 }
 
-int BoardEval::min_Value(Board *gboard, int a, int b, int depth)
+int BoardEval::min_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 {
-	if (depth == 0 || checkWin(gboard))
+	if (checkWin(gboard) || depth == 0 || (clock() - s_time) / CLOCKS_PER_SEC >= TIME_LIMIT)
 	{
-//		std::cout << a << " " << b << std::endl;
 		return evalFunc(gboard);
 	}
+
 	int max_player_value;
 
 	for (int i = 0; i < BOARD_ROW; i++)
@@ -328,8 +248,6 @@ int BoardEval::min_Value(Board *gboard, int a, int b, int depth)
 		{
 			if (gboard->game_board[i][j] == 0)
 			{
-//				gboard->status[0] = i;
-//				gboard->status[1] = j;
 				gboard->game_board[i][j] = -1;
 			}
 			else
@@ -337,7 +255,7 @@ int BoardEval::min_Value(Board *gboard, int a, int b, int depth)
 				continue;
 			}
 
-			max_player_value = max_Value(gboard, a, b, depth - 1);
+			max_player_value = max_Value(gboard, a, b, depth - 1, s_time);
 
 			// min(beta, max_val)
 			if (max_player_value < b)
@@ -361,10 +279,8 @@ int BoardEval::min_Value(Board *gboard, int a, int b, int depth)
 
 int BoardEval::evalFunc(Board *gboard)
 {
-	int cur_player = gboard->playerflag ? 1 : -1;
-	int a, b, c, d;
-	int stone_agent[5] = { 0, };
-	int stone_player[5] = { 0, };
+	int stone_agent[6] = { 0, };
+	int stone_player[6] = { 0, };
 	int result = 0;
 
 	for (int i = 0; i < BOARD_ROW; i++)
@@ -389,9 +305,20 @@ int BoardEval::evalFunc(Board *gboard)
 		}
 	}
 
-	for (int i = 0; i < 5; i++)
+	if (stone_agent[5] > 0)
 	{
-		result += (agent_value[i] * stone_agent[i]) + (player_value[i] * stone_player[i]);
+		return INT_MAX;
+	}
+	else if (stone_player[5] > 0)
+	{
+		return INT_MIN;
+	}
+	else
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			result += (agent_value[i] * stone_agent[i]) + (player_value[i] * stone_player[i]);
+		}
 	}
 
 	return result;
