@@ -23,9 +23,11 @@ public:
 	int max_Value(Board *gboard, int a, int b, int depth, clock_t s_time);
 	int min_Value(Board *gboard, int a, int b, int depth, clock_t s_time);
 	int evalFunc(Board *gboard);
+	void agentFirstMove(Board *gboard, int row, int col);
 
-	int agent_value[6] = { 0, 50, 500, 4000, 20000, 0 };
-	int player_value[6] = {0, 0, -200, -15000, -50000, 0};
+private:
+	int agent_value[6] = { 0, 3, 30, 150, 1500, 0 };
+	int player_value[6] = {0, 0, -20, -3000, -10000, 0};
 };
 
 #endif

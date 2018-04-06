@@ -15,17 +15,21 @@ bool BoardEval::checkWin(Board *gboard)
 	int cur_player = 0;
 	int a, b, c, d;
 	
-	for (int i = 0; i < BOARD_ROW; i++)
+	for (int i = gboard->getLastRow() - 2; i < gboard->getLastRow() + 3; i++)
 	{
-		for (int j = 0; j < BOARD_COLUMN; j++)
+		for (int j = gboard->getLastCol() - 2; j < gboard->getLastCol() + 3; j++)
 		{
+			if (i < 0 || i >= BOARD_ROW || j < 0 || j >= BOARD_COLUMN)
+			{
+				continue;
+			}
+
 			cur_player = gboard->getBoardValue(i, j);
 
 			if (cur_player == 0)
 			{
 				continue;
 			}
-
 			else
 			{
 				a = checkHorizontal(gboard, cur_player, i, j);
@@ -168,25 +172,25 @@ void BoardEval::abPruning(Board *gboard)
 	int max_eval_coor[2] = { 0, 0 };
 	clock_t start_time = clock();
 
-	for (int depth = 0;; depth++)	// 최선의 선택을 어떻게 저장(반환)할 것인지 다시 생각해보기
-	{										// pruning이 제대로 되는지 확인해보기(시간), evaluation function 다시 확인, check함수들 다시 확인
-		std::cout << depth << std::endl;
+	for (int depth = 0;; depth++)
+	{
+//		std::cout << "Current depth: " << depth << std::endl;
 		cur_depth_eval = max_Value(&tboard, INT_MIN, INT_MAX, depth, start_time);
-		std::cout << "cur_depth_eval: " << cur_depth_eval << " max_eval: " << max_eval <<  std::endl;
-		if (cur_depth_eval > max_eval)
-		{
-			max_eval_coor[0] = tboard.status[0];
-			max_eval_coor[1] = tboard.status[1];
-			max_eval = cur_depth_eval;
-		}
+//		std::cout << "cur_depth_eval: " << cur_depth_eval << " max_eval: " << max_eval <<  std::endl;
 
 		if ((clock() - start_time) / CLOCKS_PER_SEC >= TIME_LIMIT)
 		{
 			break;
 		}
+
+		if (cur_depth_eval > max_eval)
+		{
+			tboard.setBestMove(max_eval_coor[0], max_eval_coor[1]);
+			max_eval = cur_depth_eval;
+		}
 	}
-	std::cout << "final max_eval: " << max_eval << std::endl;
-	gboard->game_board[tboard.status[0]][tboard.status[1]] = 1;
+//	std::cout << "final max_eval: " << max_eval << std::endl;
+	gboard->setMove(tboard.getBestRow(), tboard.getBestCol());
 }
 
 int BoardEval::max_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
@@ -202,9 +206,9 @@ int BoardEval::max_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 	{
 		for (int j = 0; j < BOARD_COLUMN; j++)
 		{
-			if (gboard->game_board[i][j] == 0)
+			if (gboard->getBoardValue(i, j) == 0)
 			{
-				gboard->game_board[i][j] = 1;
+				gboard->setMove(i, j);
 			}
 			else
 			{
@@ -216,15 +220,15 @@ int BoardEval::max_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 			// max(alpha, min_val)
 			if (min_player_value > a)
 			{
-				gboard->status[0] = i;
-				gboard->status[1] = j;
+				gboard->setBestMove(i, j);
 				a = min_player_value;
 			}
 
-			gboard->game_board[i][j] = 0;
+			gboard->resetMove(i, j);
 
 			if (b <= a)
 			{
+//				std::cout << "Pruning occured!" << std::endl;
 				return a;
 			}
 		}
@@ -246,9 +250,9 @@ int BoardEval::min_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 	{
 		for (int j = 0; j < BOARD_COLUMN; j++)
 		{
-			if (gboard->game_board[i][j] == 0)
+			if (gboard->getBoardValue(i, j) == 0)
 			{
-				gboard->game_board[i][j] = -1;
+				gboard->setMove(i, j);
 			}
 			else
 			{
@@ -260,15 +264,15 @@ int BoardEval::min_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 			// min(beta, max_val)
 			if (max_player_value < b)
 			{
-				gboard->status[0] = i;
-				gboard->status[1] = j;
+				gboard->setBestMove(i, j);
 				b = max_player_value;
 			}
 			
-			gboard->game_board[i][j] = 0;
+			gboard->resetMove(i, j);
 
 			if (b <= a)
 			{
+//				std::cout << "Pruning occured!" << std::endl;
 				return b;
 			}
 		}
@@ -322,4 +326,31 @@ int BoardEval::evalFunc(Board *gboard)
 	}
 
 	return result;
+}
+
+
+//	When the first turn of the game
+//	this function will be called to prevent useless calculation
+void BoardEval::agentFirstMove(Board *gboard, int row, int col)
+{
+	int random_row = 1, random_col = 1;
+	srand((unsigned int)time(NULL));
+
+	//	Check if player's move is in middle area
+	if (row >= (BOARD_ROW / 2) - 3 && row <= (BOARD_ROW / 2) + 3 && col >= (BOARD_COLUMN / 2) - 3 && col <= (BOARD_COLUMN / 2) + 3)
+	{
+		//	Agent makes move at random position among adjacent to the player's move
+		while (random_row == 1 && random_col == 1)
+		{
+			random_row = rand() % 3;
+			random_col = rand() % 3;
+		}
+
+		gboard->setMove(row - 1 + random_row, col - 1 + random_col);
+	}
+	else
+	{
+		//	Agent makes move at middle of the board
+		gboard->setMove(BOARD_ROW / 2, BOARD_COLUMN / 2);
+	}
 }

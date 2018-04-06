@@ -1,25 +1,25 @@
-#include <iostream>
 #include "Board.h"
 #include "BoardEval.h"
-#include <iomanip>
+#include <iostream>
 
 using namespace std;
-
-
 
 int main()
 {
 	Board board_init;
 	BoardEval evaluator;
 	
-	board_init.game_board[10][10] = -1;
-	board_init.game_board[10][11] = 1;
-	board_init.game_board[9][10] = -1;
-	board_init.game_board[11][10] = 1;
+	cout << "\n\n";
+	wcout << "\t######################################" << endl;
+	wcout << "\t####                              ####" << endl;
+	wcout << "\t####     ¡Ü = Black (You)         ####" << endl;
+	wcout << "\t####     ¡Û = White (Computer)    ####" << endl;
+	wcout << "\t####                              ####" << endl;
+	wcout << "\t######################################\n\n" << endl;
 
-
-	for (int i = 0; i < 15; i++)
+	while (!board_init.isWin())
 	{
+		board_init.displayBoard();
 		board_init.moveStone();
 	}
 	

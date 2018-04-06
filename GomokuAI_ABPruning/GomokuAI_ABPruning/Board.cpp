@@ -16,10 +16,13 @@ Board::Board()
 	
 	for (int i = 0; i < 2; i++)
 	{
-		status[i] = 0;
+		bestmove[i] = 0;
+		lastmove[i] = 0;
 	}
 
 	playerflag = false;
+	game_turn = 0;
+	winflag = false;
 }
 
 Board::Board(Board* other)
@@ -34,10 +37,13 @@ Board::Board(Board* other)
 
 	for (int i = 0; i < 2; i++)
 	{
-		status[i] = 0;
+		bestmove[i] = other->bestmove[i];
+		lastmove[i] = other->lastmove[i];
 	}
 
 	playerflag = other->playerflag;
+	game_turn = other->game_turn;
+	winflag = false;
 }
 
 
@@ -51,38 +57,51 @@ void Board::moveStone()
 	int col = 0;
 	BoardEval evaluator;
 
-	cin >> row >> col;
-	row = posTranslate(row);
-
-	if (row != -1 && col >= 0 && col < BOARD_COLUMN)
+	if (playerflag == false)
 	{
-		game_board[row][col] = -1;
+		cout << "Please enter coordinate: ";
+		cin >> row >> col;
+		row = posTranslate(row);
+
+		//	Board bound check
+		if (row != -1 && col >= 0 && col < BOARD_COLUMN)
+		{
+			game_turn++;
+			setMove(row, col);
+		}
+		else
+		{
+			cout << "Error: Wrong Position" << endl;
+			return;
+		}
 	}
 	else
 	{
-		return;
+		if (game_turn < 2)
+		{
+			evaluator.agentFirstMove(this, lastmove[0], lastmove[1]);
+		}
+		else
+		{
+			evaluator.abPruning(this);
+		}
 	}
-
-	displayBoard();
 
 	if (evaluator.checkWin(this))
 	{
-		cout << "Black Win" << endl;
+		winflag = true;
+		displayBoard();
+
+		if (playerflag == true)
+		{
+			cout << "\n\n******************  White Win!  ******************\n\n" << endl;
+		}
+		else
+		{
+			cout << "\n\n******************  Black Win!  ******************\n\n" << endl;
+		}
 		return;
 	}
-
-	playerflag = !playerflag;
-
-	evaluator.abPruning(this);
-	displayBoard();
-
-	if (evaluator.checkWin(this))
-	{
-		cout << "White Win" << endl;
-		return;
-	}
-
-	playerflag = !playerflag;
 }
 
 int Board::posTranslate(char row)
@@ -98,7 +117,6 @@ int Board::posTranslate(char row)
 	}
 	else
 	{
-		cout << "Error: Wrong Position" << endl;
 		return -1;
 	}
 
@@ -110,9 +128,54 @@ int Board::getBoardValue(int row, int col)
 	return game_board[row][col];
 }
 
-int *Board::getLatestPos()
+int Board::getLastRow()
 {
-	return status;
+	return lastmove[0];
+}
+
+int Board::getLastCol()
+{
+	return lastmove[1];
+}
+
+bool Board::getCurrentPlayer()
+{
+	return playerflag;
+}
+
+int Board::getBestRow()
+{
+	return bestmove[0];
+}
+
+int Board::getBestCol()
+{
+	return bestmove[1];
+}
+
+void Board::setMove(int row, int col)
+{
+	game_board[row][col] = playerflag ? 1 : -1;
+	lastmove[0] = row;
+	lastmove[1] = col;
+	playerflag = !playerflag;
+}
+
+void Board::resetMove(int row, int col)
+{
+	game_board[row][col] = 0;
+	playerflag = !playerflag;
+}
+
+void Board::setBestMove(int row, int col)
+{
+	bestmove[0] = row;
+	bestmove[1] = col;
+}
+
+bool Board::isWin()
+{
+	return winflag;
 }
 
 void Board::displayBoard()
@@ -152,5 +215,5 @@ void Board::displayBoard()
 		}
 	}
 
-	cout << endl;
+	cout << "\n\n";
 }
