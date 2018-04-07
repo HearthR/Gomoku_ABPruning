@@ -14,7 +14,8 @@ bool BoardEval::checkWin(Board *gboard)
 {
 	int cur_player = 0;
 	int a, b, c, d;
-	
+
+	//	가장 마지막에 둔 수를 중심으로 5*5 영역만 체크하도록 범위를 제한합니다.
 	for (int i = gboard->getLastRow() - 2; i < gboard->getLastRow() + 3; i++)
 	{
 		for (int j = gboard->getLastCol() - 2; j < gboard->getLastCol() + 3; j++)
@@ -60,6 +61,7 @@ int BoardEval::checkHorizontal(Board *gboard, int cur_player, int row, int col)
 	
 	for (int i = 0; i < 5; i++)
 	{
+		//	상대편의 돌이 발견되면 0을 반환합니다.
 		if (gboard->getBoardValue(row, col - 2 + i) == -cur_player)
 		{
 			return 0;
@@ -89,6 +91,7 @@ int BoardEval::checkVertical(Board *gboard, int cur_player, int row, int col)
 
 	for (int i = 0; i < 5; i++)
 	{
+		//	상대편의 돌이 발견되면 0을 반환합니다.
 		if (gboard->getBoardValue(row - 2 + i, col) == -cur_player)
 		{
 			return 0;
@@ -118,6 +121,7 @@ int BoardEval::checkDiagonalA(Board *gboard, int cur_player, int row, int col)
 
 	for (int i = 0; i < 5; i++)
 	{
+		//	상대편의 돌이 발견되면 0을 반환합니다.
 		if (gboard->getBoardValue(row - 2 + i, col - 2 + i) == -cur_player)
 		{
 			return 0;
@@ -147,6 +151,7 @@ int BoardEval::checkDiagonalB(Board *gboard, int cur_player, int row, int col)
 
 	for (int i = 0; i < 5; i++)
 	{
+		//	상대편의 돌이 발견되면 0을 반환합니다.
 		if (gboard->getBoardValue(row - 2 + i, col + 2 - i) == -cur_player)
 		{
 			return 0;
@@ -168,33 +173,37 @@ void BoardEval::abPruning(Board *gboard)
 {
 	Board tboard(gboard);
 	int cur_depth_eval;
-	int max_eval = INT_MIN;
+	int max_eval_value = INT_MIN;
 	int max_eval_coor[2] = { 0, 0 };
 	clock_t start_time = clock();
 
+	//	Iterative deepening
 	for (int depth = 0;; depth++)
 	{
-//		std::cout << "Current depth: " << depth << std::endl;
-		cur_depth_eval = max_Value(&tboard, INT_MIN, INT_MAX, depth, start_time);
-//		std::cout << "cur_depth_eval: " << cur_depth_eval << " max_eval: " << max_eval <<  std::endl;
 
+		cur_depth_eval = max_Value(&tboard, INT_MIN, INT_MAX, depth, start_time);
+
+		//	시간제한을 초과했는지 체크합니다.
 		if ((clock() - start_time) / CLOCKS_PER_SEC >= TIME_LIMIT)
 		{
 			break;
 		}
 
-		if (cur_depth_eval > max_eval)
+		//	현재 depth의 결과와 이전 depth의 결과 중 더 큰 결과를 저장합니다.
+		if (cur_depth_eval > max_eval_value)
 		{
-			tboard.setBestMove(max_eval_coor[0], max_eval_coor[1]);
-			max_eval = cur_depth_eval;
+			max_eval_value = cur_depth_eval;
+			max_eval_coor[0] = tboard.getBestRow();
+			max_eval_coor[1] = tboard.getBestCol();
 		}
 	}
-//	std::cout << "final max_eval: " << max_eval << std::endl;
-	gboard->setMove(tboard.getBestRow(), tboard.getBestCol());
+
+	gboard->setMove(max_eval_coor[0], max_eval_coor[1]);
 }
 
 int BoardEval::max_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 {
+	//	terminal state인지, depth가 0인지, 시간제한을 초과했는지 체크합니다.
 	if (checkWin(gboard) || depth == 0 || (clock() - s_time) / CLOCKS_PER_SEC >= TIME_LIMIT)
 	{
 		return evalFunc(gboard);
@@ -206,6 +215,7 @@ int BoardEval::max_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 	{
 		for (int j = 0; j < BOARD_COLUMN; j++)
 		{
+			//	legal move인지 체크합니다.
 			if (gboard->getBoardValue(i, j) == 0)
 			{
 				gboard->setMove(i, j);
@@ -223,12 +233,11 @@ int BoardEval::max_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 				gboard->setBestMove(i, j);
 				a = min_player_value;
 			}
-
+			//	다음 state를 위해 이번 state에서 취한 action을 초기화합니다.
 			gboard->resetMove(i, j);
 
 			if (b <= a)
 			{
-//				std::cout << "Pruning occured!" << std::endl;
 				return a;
 			}
 		}
@@ -239,6 +248,7 @@ int BoardEval::max_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 
 int BoardEval::min_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 {
+	//	terminal state인지, depth가 0인지, 시간제한을 초과했는지 체크합니다.
 	if (checkWin(gboard) || depth == 0 || (clock() - s_time) / CLOCKS_PER_SEC >= TIME_LIMIT)
 	{
 		return evalFunc(gboard);
@@ -250,6 +260,7 @@ int BoardEval::min_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 	{
 		for (int j = 0; j < BOARD_COLUMN; j++)
 		{
+			//	legal move인지 체크합니다.
 			if (gboard->getBoardValue(i, j) == 0)
 			{
 				gboard->setMove(i, j);
@@ -261,18 +272,16 @@ int BoardEval::min_Value(Board *gboard, int a, int b, int depth, clock_t s_time)
 
 			max_player_value = max_Value(gboard, a, b, depth - 1, s_time);
 
-			// min(beta, max_val)
+			//	min(beta, max_val)
 			if (max_player_value < b)
 			{
-				gboard->setBestMove(i, j);
 				b = max_player_value;
 			}
-			
+			//	다음 state를 위해 이번 state에서 취한 action을 초기화합니다.
 			gboard->resetMove(i, j);
 
 			if (b <= a)
 			{
-//				std::cout << "Pruning occured!" << std::endl;
 				return b;
 			}
 		}
@@ -287,36 +296,39 @@ int BoardEval::evalFunc(Board *gboard)
 	int stone_player[6] = { 0, };
 	int result = 0;
 
+	//	보드의 모든 위치에 대해 점수를 산출합니다.
 	for (int i = 0; i < BOARD_ROW; i++)
 	{
 		for (int j = 0; j < BOARD_COLUMN; j++)
 		{
+			//	각 check 함수들은 보드의 i, j 위치를 중심으로 각 방향에 맞게 5칸을 살펴보는데,
+			//	만약 5칸 안에 cur_player의 상대편의 돌이 하나라도 발견된다면 0을 반환하고
+			//	상대편의 돌이 없다면 5칸 안에 들어있는 cur_player의 돌의 개수를 반환합니다.
+			//	이는 5칸 안에 돌을 계속해서 뒀을 경우 이길 수 있는 유효한 위치를 판별합니다.
 			stone_agent[checkHorizontal(gboard, 1, i, j)] += 1;
 			stone_agent[checkVertical(gboard, 1, i, j)] += 1;
 			stone_agent[checkDiagonalA(gboard, 1, i, j)] += 1;
 			stone_agent[checkDiagonalB(gboard, 1, i, j)] += 1;
-		}
-	}
 
-	for (int i = 0; i < BOARD_ROW; i++)
-	{
-		for (int j = 0; j < BOARD_COLUMN; j++)
-		{
 			stone_player[checkHorizontal(gboard, -1, i, j)] += 1;
 			stone_player[checkVertical(gboard, -1, i, j)] += 1;
 			stone_player[checkDiagonalA(gboard, -1, i, j)] += 1;
 			stone_player[checkDiagonalB(gboard, -1, i, j)] += 1;
 		}
 	}
-
+	//	만약 5칸 안에 AI의 돌이 5개가 들어있는 위치가 한 번이라도 발견되었다면
+	//	이는 AI의 승리를 의미하므로 최댓값을 반환합니다.
 	if (stone_agent[5] > 0)
 	{
 		return INT_MAX;
 	}
+	//	만약 5칸 안에 player의 돌이 5개가 들어있는 위치가 한 번이라도 발견되었다면
+	//	이는 player의 승리를 의미하므로 최솟값을 반환합니다.
 	else if (stone_player[5] > 0)
 	{
 		return INT_MIN;
 	}
+	//	둘 다 아니라면 weight를 곱해서 점수를 산출합니다.
 	else
 	{
 		for (int i = 0; i < 5; i++)
@@ -329,17 +341,16 @@ int BoardEval::evalFunc(Board *gboard)
 }
 
 
-//	When the first turn of the game
-//	this function will be called to prevent useless calculation
+//	만약 첫 번째 턴일 경우 이 함수가 호출됩니다.
 void BoardEval::agentFirstMove(Board *gboard, int row, int col)
 {
 	int random_row = 1, random_col = 1;
 	srand((unsigned int)time(NULL));
 
-	//	Check if player's move is in middle area
+	//	플레이어가 둔 수가 보드의 중앙 영역에 있는지 체크합니다.
 	if (row >= (BOARD_ROW / 2) - 3 && row <= (BOARD_ROW / 2) + 3 && col >= (BOARD_COLUMN / 2) - 3 && col <= (BOARD_COLUMN / 2) + 3)
 	{
-		//	Agent makes move at random position among adjacent to the player's move
+		//	AI는 플레이어가 둔 수에 인접한 위치 중 랜덤한 위치에 수를 둡니다.
 		while (random_row == 1 && random_col == 1)
 		{
 			random_row = rand() % 3;
@@ -350,7 +361,7 @@ void BoardEval::agentFirstMove(Board *gboard, int row, int col)
 	}
 	else
 	{
-		//	Agent makes move at middle of the board
+		//	AI는 보드의 정 중앙에 수를 둡니다.
 		gboard->setMove(BOARD_ROW / 2, BOARD_COLUMN / 2);
 	}
 }
