@@ -30,10 +30,10 @@ public:
 	void displayBoard();
 
 private:
-	int game_board[BOARD_ROW][BOARD_COLUMN];	// 0 : empty, 1 : AI, -1: USER
-	int bestmove[2];
-	int lastmove[2];
-	bool playerflag;	// true : AI, false : USER
+	int game_board[BOARD_ROW][BOARD_COLUMN];	//	0 : empty,  1 : AI,  -1: USER
+	int bestmove[2];	//	AI가 판단한 가장 최적의 수를 저장
+	int lastmove[2];	//	가장 마지막에 둔 수를 저장
+	bool playerflag;	//	true : AI, false : USER
 	int game_turn;
 	bool winflag;
 };

@@ -26,8 +26,8 @@ public:
 	void agentFirstMove(Board *gboard, int row, int col);
 
 private:
-	int agent_value[6] = { 0, 3, 30, 150, 1500, 0 };
-	int player_value[6] = {0, 0, -20, -3000, -10000, 0};
+	int agent_value[6] = { 0, 3, 30, 150, 1500, 0 };	//	AI의 evaluation weight 값
+	int player_value[6] = {0, 0, -20, -3000, -10000, 0};//	player의 evaluation weight 값
 };
 
 #endif
