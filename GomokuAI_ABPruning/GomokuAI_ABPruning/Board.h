@@ -16,7 +16,7 @@ public:
 	Board(Board* other);
 	~Board();
 	void moveStone();
-	int posTranslate(char input1);
+	int posTranslate(char row);
 	int getBoardValue(int row, int col);
 	int getLastRow();
 	int getLastCol();
